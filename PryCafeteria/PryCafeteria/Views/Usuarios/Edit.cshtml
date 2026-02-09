@@ -1,0 +1,54 @@
+﻿@model PryCafeteria.Models.Usuario
+
+@{
+    ViewData["Title"] = "Editar Usuario";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-cafe text-white p-3">
+                <h4 class="mb-1">Editar Usuario</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="UsuarioId" />
+
+                    <div class="mb-3">
+                        <label asp-for="Nombre" class="form-label fw-bold text-cafe">Nombre Completo</label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ingrese el nombre completo"/>
+                        <span asp-validation-for="Nombre" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-bold text-cafe">Correo Electrónico</label>
+                        <input asp-for="Email" class="form-control" placeholder="ejemplo@correo.com"/>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Contrasena" class="form-label fw-bold text-cafe">Contraseña</label>
+                        <input asp-for="Contrasena" type="password" class="form-control" placeholder="Ingrese una contraseña" />
+                        <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="RolId" class="form-label fw-bold text-cafe">Rol</label>
+                        <select asp-for="RolId" class="form-select" asp-items="ViewBag.RolId"></select>
+                        <span asp-validation-for="RolId" class="text-danger small"></span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-cafe py-2 fw-bold">
+                            Guardar Cambios
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary py-2"> 
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

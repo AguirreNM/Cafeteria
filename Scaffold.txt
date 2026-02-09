@@ -1,0 +1,1 @@
+Scaffold-DbContext "Persist Security Info=False;Integrated Security=true;  Initial Catalog= BDCAFETERIA; Server= localhost\SQLEXPRESS;Encrypt=True; TrustServerCertificate=True;" Microsoft.EntityFrameworkCore.SqlServer -OutputDir Models -Force

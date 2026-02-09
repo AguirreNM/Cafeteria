@@ -1,0 +1,53 @@
+﻿@model PryCafeteria.Models.ProductosTamanio
+
+@{
+    ViewData["Title"] = "Edición de Tamaños de Productos";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-cafe text-white p-3">
+                <h4 class="mb-1">Editar Tamaño de Producto</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Edit">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <input type="hidden" asp-for="ProductoTamanioId" />
+                    <div class="mb-3">
+                        <label asp-for="ProductoId" class="form-label fw-bold text-cafe">Producto</label>
+                        <select asp-for="ProductoId" class="form-select" asp-items="ViewBag.ProductoId"></select>
+                        <span asp-validation-for="ProductoId" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="TamanioId" class="form-label fw-bold text-cafe">Tamaño</label>
+                        <select asp-for="TamanioId" class="form-select" asp-items="ViewBag.TamanioId"></select>
+                        <span asp-validation-for="TamanioId" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Precio" class="form-label fw-bold text-cafe">Precio</label>
+                        <input asp-for="Precio" class="form-control" />
+                        <span asp-validation-for="Precio" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Stock" class="form-label fw-bold text-cafe">Stock</label>
+                        <input asp-for="Stock" class="form-control" />
+                        <span asp-validation-for="Stock" class="text-danger small"></span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-cafe py-2 fw-bold">
+                            Guardar Cambios
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary py-2">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -1,0 +1,52 @@
+﻿@model PryCafeteria.Models.ProductosTamanio
+
+@{
+    ViewData["Title"] = "Detalles de Tamaño del Producto";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-cafe text-white p-3">
+                <h4 class="mb-1">Detalles del Tamaño del Producto</h4>
+            </div>
+            <div class="card-body p-4">
+                <dl class="row mb-0">
+                    <dt class="col-sm-4 text-cafe fw-bold py-3">
+                        @Html.DisplayNameFor(model => model.Precio)
+                    </dt>
+                    <dd class="col-sm-8 py-3">
+                        @Html.DisplayFor(model => model.Precio)
+                    </dd>
+                    <dt class="col-sm-4 text-cafe fw-bold py-3">
+                        @Html.DisplayNameFor(model => model.Stock)
+                    </dt>
+                    <dd class="col-sm-8 py-3">
+                        @Html.DisplayFor(model => model.Stock)
+                    </dd>
+                    <dt class="col-sm-4 text-cafe fw-bold py-3col-sm-4 text-cafe fw-bold py-3">
+                        @Html.DisplayNameFor(model => model.Producto)
+                    </dt>
+                    <dd class="col-sm-8 py-3">
+                        @Html.DisplayFor(model => model.Producto.NombreProducto)
+                    </dd>
+                    <dt class="col-sm-4 text-cafe fw-bold py-3">
+                        @Html.DisplayNameFor(model => model.Tamanio)
+                    </dt>
+                    <dd class="col-sm-8 py-3">
+                        @Html.DisplayFor(model => model.Tamanio.NombreTamanio)
+                    </dd>
+                    <hr class="my-4">
+                    <div class="d-flex gap-2">
+                        <a asp-action="Edit" asp-route-id="@Model?.ProductoTamanioId" class="btn btn-cafe">
+                            Editar Tamaño del Producto
+                        </a>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Regresar
+                        </a>
+                    </div>
+                </dl>
+            </div>
+        </div>
+    </div>
+</div>

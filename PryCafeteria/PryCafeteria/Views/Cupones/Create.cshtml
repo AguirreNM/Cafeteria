@@ -1,0 +1,66 @@
+﻿@model PryCafeteria.Models.Cupone
+
+@{
+    ViewData["Title"] = "Creación de Cupón";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-cafe text-white p-3">
+                <h4 class="mb-1">Nuevo Cupón</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <div class="mb-3">
+                        <label asp-for="NombreCupon" class="form-label fw-bold text-cafe">Nombre del Cupón</label>
+                        <input asp-for="NombreCupon" class="form-control form-control-cafe" placeholder="Ingrese el nombre del cupón" />
+                        <span asp-validation-for="NombreCupon" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="TipoDescuento" class="form-label fw-bold text-cafe">Tipo de Descuento</label>
+                        <input asp-for="TipoDescuento" class="form-control form-control-cafe" placeholder="Ingrese el tipo de descuento" />
+                        <span asp-validation-for="TipoDescuento" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="ValorDescuento" class="form-label fw-bold text-cafe">Valor de Descuento</label>
+                        <input asp-for="ValorDescuento" class="form-control form-control-cafe" placeholder="Ingrese el valor de descuento" />
+                        <span asp-validation-for="ValorDescuento" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="FechaInicio" class="form-label fw-bold text-cafe">Fecha de Inicio</label>
+                        <input asp-for="FechaInicio" class="form-control form-control-cafe" />
+                        <span asp-validation-for="FechaInicio" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="FechaFin" class="form-label fw-bold text-cafe">Fecha Final</label>
+                        <input asp-for="FechaFin" class="form-control form-control-cafe" />
+                        <span asp-validation-for="FechaFin" class="text-danger small"></span>
+                    </div>
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input asp-action="Activo" class="form-check-input" type="checkbox" checked />
+                            <label asp-for="Activo" class="form-check-label fw-bold text-cafe">
+                                Producto Disponible
+                            </label>
+                        </div>
+                        <span asp-validation-for="Activo" class="text-danger small"></span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-cafe py-2">
+                            Guardar Cupón
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

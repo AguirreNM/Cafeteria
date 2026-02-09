@@ -1,0 +1,56 @@
+﻿@model IEnumerable<PryCafeteria.Models.ProductosTamanio>
+
+@{
+    ViewData["Title"] = "Tamaños de productos";
+}
+
+<h1 class="text-cafe mt-4 mb-4">Gestión de Tamaños de productos</h1>
+
+<p class="mb-3">
+    <a asp-action="Create" class="btn btn-cafe">
+        Nuevo Tamaño de producto
+    </a>
+</p>
+
+<table class="table table-hover align-middle border shadow-sm bg-white">
+    <thead class="table-dark">
+        <tr class="text-center">
+            <th class="py-3">
+                @Html.DisplayNameFor(model => model.Producto)
+            </th>
+            <th class="py-3">
+                @Html.DisplayNameFor(model => model.Tamanio)
+            </th>
+            <th class="py-3">
+                @Html.DisplayNameFor(model => model.Precio)
+            </th>
+            <th class="py-3">
+                @Html.DisplayNameFor(model => model.Stock)
+            </th>
+            <th class="py-3">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr class="text-center">
+            <td class="fw-bold">
+                    @Html.DisplayFor(modelItem => item.Producto.NombreProducto)
+            </td>
+            <td class="fw-bold">
+                    @Html.DisplayFor(modelItem => item.Tamanio.NombreTamanio)
+            </td>
+            <td class="fw-bold">
+                @Html.DisplayFor(modelItem => item.Precio)
+            </td>
+            <td class="fw-bold">
+                @Html.DisplayFor(modelItem => item.Stock)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ProductoTamanioId" class="btn btn-sm btn-beige text-white me-1">Actualizar</a> |
+                <a asp-action="Details" asp-route-id="@item.ProductoTamanioId" class="btn btn-sm btn-cafe text-white me-1">Detalles</a> |
+                <a asp-action="Delete" asp-route-id="@item.ProductoTamanioId" class="btn btn-sm btn-danger">Eliminar</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

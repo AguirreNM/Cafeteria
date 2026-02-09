@@ -1,0 +1,37 @@
+﻿@model PryCafeteria.Models.Tamanio
+
+@{
+    ViewData["Title"] = "Creación de Tamaños";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-6">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-cafe text-white p-3">
+                <h4 class="mb-1">Nuevo Tamaño</h4>
+            </div>
+            <div class="card-body p-4">
+                <form asp-action="Create">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <div class="mb-3">
+                        <label asp-for="NombreTamanio" class="form-label fw-bold text-cafe">Nombre del Tamaño</label>
+                        <input asp-for="NombreTamanio" class="form-control form-control-cafe" placeholder="Ingrese el nombre del tamaño" />
+                        <span asp-validation-for="NombreTamanio" class="text-danger small"></span>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-cafe py-2">
+                            Guardar Tamaño
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

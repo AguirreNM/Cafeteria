@@ -1,0 +1,62 @@
+﻿@model PryCafeteria.Models.Producto
+
+@{
+    ViewData["Title"] = "Eliminar Producto";
+}
+
+<div class="row justify-content-center mt-4">      
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-danger text-white p-3">
+                <h4 class="mb-1">Eliminar Producto</h4>
+            </div>
+            <div>
+                <h5 class="text-cafe mb-3">Información del Producto</h5>
+                <dl class="row mb-4">
+                    <dt class = "col text-cafe fw-bold">
+                        @Html.DisplayNameFor(model => model.NombreProducto)
+                    </dt>
+                    <dd class = "col-sm-8">
+                        <span class="h6">@Html.DisplayFor(model => model.NombreProducto)</span>
+                    </dd>
+                    <dt class = "col-sm-4 text-cafe fw-bold">
+                        @Html.DisplayNameFor(model => model.Descripcion)
+                    </dt>
+                    <dd class = "col-sm-8 text-muted">
+                        @Html.DisplayFor(model => model.Descripcion)
+                    </dd>
+                    <dt class = "col-sm-4 text-cafe fw-bold">
+                        @Html.DisplayNameFor(model => model.Imagen)
+                    </dt>
+                    <dd class = "col-sm-8">
+                        @Html.DisplayFor(model => model.Imagen)
+                    </dd>
+                    <dt class = "col-sm-4 text-cafe fw-bold">
+                        @Html.DisplayNameFor(model => model.Disponible)
+                    </dt>
+                    <dd class = "col-sm-8">
+                        @Html.DisplayFor(model => model.Disponible)
+                    </dd>
+                    <dt class = "col-sm-4 text-cafe fw-bold">
+                        @Html.DisplayNameFor(model => model.Categoria)
+                    </dt>
+                    <dd class = "col-sm-8">
+                        <span class="badge bg-info">@Html.DisplayFor(model => model.Categoria.NombreCategoria)</span>
+                    </dd>
+                </dl>
+    
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="ProductoId" />
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger py-2 fw-bold">
+                            Confirmar Eliminación
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary py-2">
+                            Cancelar
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div> 

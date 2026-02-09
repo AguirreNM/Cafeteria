@@ -1,0 +1,35 @@
+﻿@model PryCafeteria.Models.MetodosPago
+
+@{
+    ViewData["Title"] = "Detalles del Método de Pago";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-cafe text-white p-3">
+                <h4 class="mb-1">Detalles del Método de Pago</h4>
+            </div>
+            <div class="card-body p-4">
+                <dl class="row mb-0">
+                    <dt class = "col-sm-4 text-cafe fw-bold py-3">
+                        @Html.DisplayNameFor(model => model.NombreMetodoPago)
+                    </dt>
+                    <dd class = "col-sm-8 py-3">
+                        @Html.DisplayFor(model => model.NombreMetodoPago)
+                    </dd>
+                </dl>
+                <hr class="my-4">
+
+                <div class="d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model?.MetodoPagoId" class="btn btn-cafe">
+                        Editar Usuario
+                    </a>
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        Regresar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

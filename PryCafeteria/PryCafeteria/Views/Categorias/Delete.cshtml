@@ -1,0 +1,36 @@
+﻿@model PryCafeteria.Models.Categoria
+
+@{
+    ViewData["Title"] = "Eliminar Usuario";
+}
+
+<div class="row justify-content-center mt-4">
+    <div class="col-md-8">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-danger text-white p-3">
+                <h4 class="mb-1">Eliminar Categoría</h4>
+            </div>
+            <div class="card-body p-4">
+                <h5 class="text-cafe mb-3">Información de la Categoría</h5>
+                <dl class="row mb-4">
+                    <dt class="col-sm-4 text-cafe fw-bold">
+                        @Html.DisplayNameFor(model => model.NombreCategoria)
+                    </dt>
+                    <dd class = "col-sm-8">
+                        @Html.DisplayFor(model => model.NombreCategoria)
+                    </dd>
+                </dl>
+    
+                <form asp-action="Delete">
+                    <input type="hidden" asp-for="CategoriaId" />
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-danger py-2 fw-bold">
+                            Confirmar Eliminación
+                        </button>
+                        <a asp-action="Index" class="btn btn-outline-secondary py-2">Cancelar y Volver</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
