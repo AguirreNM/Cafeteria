@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using PryCafeteria.Models;
 
 namespace PryCafeteria.Models;
 
-public partial class BdcafeteriaContext : DbContext
+public partial class BdcafeteriaContext 
+    : IdentityDbContext<ApplicationUser>
 {
     public BdcafeteriaContext()
     {
@@ -31,18 +34,12 @@ public partial class BdcafeteriaContext : DbContext
 
     public virtual DbSet<ProductosTamanio> ProductosTamanios { get; set; }
 
-    public virtual DbSet<Role> Roles { get; set; }
-
     public virtual DbSet<Tamanio> Tamanios { get; set; }
-
-    public virtual DbSet<Usuario> Usuarios { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Persist Security Info=False;Integrated Security=true;  Initial Catalog= BDCAFETERIA; Server= localhost\\SQLEXPRESS;Encrypt=True; TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.Entity<Categoria>(entity =>
         {
             entity.HasKey(e => e.CategoriaId).HasName("PK__Categori__F353C1E5EFC32C83");
@@ -120,7 +117,7 @@ public partial class BdcafeteriaContext : DbContext
             entity.HasOne(d => d.Usuario).WithMany(p => p.DireccionesEntregas)
                 .HasForeignKey(d => d.UsuarioId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_DireccionesEntrega_Usuarios");
+                .HasConstraintName("FK_DireccionesEntrega_AspNetUsers");
         });
 
         modelBuilder.Entity<MetodosPago>(entity =>
@@ -164,7 +161,7 @@ public partial class BdcafeteriaContext : DbContext
             entity.HasOne(d => d.Usuario).WithMany(p => p.Pedidos)
                 .HasForeignKey(d => d.UsuarioId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Pedidos_Usuarios");
+                .HasConstraintName("FK_Pedidos_AspNetUsers");
         });
 
         modelBuilder.Entity<Producto>(entity =>
@@ -207,17 +204,6 @@ public partial class BdcafeteriaContext : DbContext
                 .HasConstraintName("FK_ProductosTamanios_Tamanios");
         });
 
-        modelBuilder.Entity<Role>(entity =>
-        {
-            entity.HasKey(e => e.RolId).HasName("PK__Roles__F92302F1516FC662");
-
-            entity.HasIndex(e => e.RolNombre, "UQ__Roles__65F09DC1547771B2").IsUnique();
-
-            entity.Property(e => e.RolNombre)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-        });
-
         modelBuilder.Entity<Tamanio>(entity =>
         {
             entity.HasKey(e => e.TamanioId).HasName("PK__Tamanios__3C536BF5A5D6817C");
@@ -227,28 +213,6 @@ public partial class BdcafeteriaContext : DbContext
             entity.Property(e => e.NombreTamanio)
                 .HasMaxLength(30)
                 .IsUnicode(false);
-        });
-
-        modelBuilder.Entity<Usuario>(entity =>
-        {
-            entity.HasKey(e => e.UsuarioId).HasName("PK__Usuarios__2B3DE7B81E20315D");
-
-            entity.HasIndex(e => e.Email, "UQ__Usuarios__A9D10534BED76006").IsUnique();
-
-            entity.Property(e => e.Contrasena)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-            entity.Property(e => e.Email)
-                .HasMaxLength(100)
-                .IsUnicode(false);
-            entity.Property(e => e.Nombre)
-                .HasMaxLength(50)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.Rol).WithMany(p => p.Usuarios)
-                .HasForeignKey(d => d.RolId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Usuarios_Roles");
         });
 
         OnModelCreatingPartial(modelBuilder);

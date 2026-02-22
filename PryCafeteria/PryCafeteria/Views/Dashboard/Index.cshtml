@@ -1,0 +1,136 @@
+﻿@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<!-- Header Banner -->
+<div class="dash-header mt-3">
+    <div style="position:relative; z-index:1;">
+        <div class="dash-header-label">Panel Administrativo — Starbucks</div>
+        <h2 class="dash-header-title">Bienvenido de nuevo 👋</h2>
+        <div class="dash-header-date">
+            @DateTime.Now.ToString("dddd, dd 'de' MMMM 'de' yyyy", new System.Globalization.CultureInfo("es-PE"))
+        </div>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="section-label">Resumen del negocio</div>
+<div class="row g-3 mb-4">
+
+    <div class="col-6 col-md-4 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon-wrap" style="background:#e8f5ef;">🛒</div>
+            <div class="stat-number">@ViewBag.TotalProductos</div>
+            <div class="stat-label">Productos</div>
+            <a asp-controller="Productos" asp-action="Index" class="stat-action">Ver todos →</a>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon-wrap" style="background:#e8f5ef;">📂</div>
+            <div class="stat-number">@ViewBag.TotalCategorias</div>
+            <div class="stat-label">Categorías</div>
+            <a asp-controller="Categorias" asp-action="Index" class="stat-action">Ver todas →</a>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon-wrap" style="background:#fdf6ec;">🎫</div>
+            <div class="stat-number">@ViewBag.TotalCupones</div>
+            <div class="stat-label">Cupones activos</div>
+            <a asp-controller="Cupones" asp-action="Index" class="stat-action">Ver todos →</a>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-6 col-lg @(ViewBag.StockBajo > 0 ? "danger-card" : "")">
+        <div class="stat-card @(ViewBag.StockBajo > 0 ? "danger-card" : "")">
+            <div class="stat-icon-wrap" style="background:@(ViewBag.StockBajo > 0 ? "#fdecea" : "#e8f5ef");">⚠️</div>
+            <div class="stat-number @(ViewBag.StockBajo > 0 ? "danger" : "")">@ViewBag.StockBajo</div>
+            <div class="stat-label">Stock crítico</div>
+            <a asp-controller="ProductosTamanios" asp-action="Index" class="stat-action">Ver stock →</a>
+        </div>
+    </div>
+
+    <div class="col-6 col-md-6 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon-wrap" style="background:#e8f5ef;">📦</div>
+            <div class="stat-number">@ViewBag.PedidosHoy</div>
+            <div class="stat-label">Pedidos hoy</div>
+            @if (ViewBag.PedidosPendientes > 0)
+            {
+                <span class="badge-bajo mt-2 d-inline-block">@ViewBag.PedidosPendientes pendiente(s)</span>
+            }
+        </div>
+    </div>
+
+    <div class="col-6 col-md-6 col-lg">
+        <div class="stat-card">
+            <div class="stat-icon-wrap" style="background:#e8f5ef;">💰</div>
+            <div class="stat-number">S/ @ViewBag.IngresosHoy.ToString("N2")</div>
+            <div class="stat-label">Ingresos hoy</div>
+            <span class="stat-action">Pedidos entregados</span>
+        </div>
+    </div>
+
+</div>
+
+<!-- Alerta stock crítico -->
+@if (ViewBag.StockBajo > 0)
+{
+    <div class="stock-alert-card">
+        <div class="stock-alert-title">
+            ⚠ Productos con stock crítico
+        </div>
+        <div class="row g-2">
+            @foreach (var pt in ViewBag.ProductosStockBajo)
+            {
+                <div class="col-12 col-md-6 col-lg-4">
+                    <div class="stock-item">
+                        <div>
+                            <div class="stock-item-name">@pt.Producto.NombreProducto</div>
+                            <div class="stock-item-sub">@pt.Tamanio.NombreTamanio</div>
+                        </div>
+                        @if (pt.Stock == 0)
+                        {
+                            <span class="badge-agotado">Agotado</span>
+                        }
+                        else
+                        {
+                            <span class="badge-bajo">@pt.Stock unid.</span>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- Últimos productos -->
+<div class="section-label">Últimos productos agregados</div>
+<div class="table-card">
+    <div class="table-card-header">
+        <div class="table-card-title">Productos recientes</div>
+        <a asp-controller="Productos" asp-action="Index" class="stat-action">Ver todos →</a>
+    </div>
+    <div>
+        @foreach (var p in ViewBag.UltimosProductos)
+        {
+            <div class="product-row">
+                <div>
+                    <div class="product-name">@p.NombreProducto</div>
+                    <div class="product-cat">@p.Categoria.NombreCategoria</div>
+                </div>
+                @if (p.Disponible)
+                {
+                    <span class="badge-disponible">Disponible</span>
+                }
+                else
+                {
+                    <span class="badge-no-disponible">No disponible</span>
+                }
+            </div>
+        }
+    </div>
+</div>

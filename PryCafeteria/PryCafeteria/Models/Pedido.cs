@@ -7,7 +7,7 @@ public partial class Pedido
 {
     public int PedidoId { get; set; }
 
-    public int UsuarioId { get; set; }
+    public string UsuarioId { get; set; } = null!;
 
     public DateTime FechaPedido { get; set; }
 
@@ -29,5 +29,5 @@ public partial class Pedido
 
     public virtual MetodosPago MetodoPago { get; set; } = null!;
 
-    public virtual Usuario Usuario { get; set; } = null!;
+    public virtual ApplicationUser Usuario { get; set; } = null!;
 }

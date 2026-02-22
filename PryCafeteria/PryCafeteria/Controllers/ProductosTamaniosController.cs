@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using PryCafeteria.Models;
 
 namespace PryCafeteria.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ProductosTamaniosController : Controller
     {
         private readonly BdcafeteriaContext _context;
@@ -65,6 +67,18 @@ namespace PryCafeteria.Controllers
 
             if (ModelState.IsValid)
             {
+                // HU08: validar combinación única producto-tamaño
+                var existe = await _context.ProductosTamanios.AnyAsync(pt =>
+                    pt.ProductoId == productosTamanio.ProductoId &&
+                    pt.TamanioId == productosTamanio.TamanioId);
+                if (existe)
+                {
+                    ModelState.AddModelError("", "Ya existe esta combinación de producto y tamaño");
+                    ViewData["ProductoId"] = new SelectList(_context.Productos, "ProductoId", "NombreProducto", productosTamanio.ProductoId);
+                    ViewData["TamanioId"] = new SelectList(_context.Tamanios, "TamanioId", "NombreTamanio", productosTamanio.TamanioId);
+                    return View(productosTamanio);
+                }
+
                 _context.Add(productosTamanio);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -109,6 +123,19 @@ namespace PryCafeteria.Controllers
 
             if (ModelState.IsValid)
             {
+                // HU08: validar combinación única producto-tamaño excluyendo el actual
+                var existe = await _context.ProductosTamanios.AnyAsync(pt =>
+                    pt.ProductoId == productosTamanio.ProductoId &&
+                    pt.TamanioId == productosTamanio.TamanioId &&
+                    pt.ProductoTamanioId != productosTamanio.ProductoTamanioId);
+                if (existe)
+                {
+                    ModelState.AddModelError("", "Ya existe esta combinación de producto y tamaño");
+                    ViewData["ProductoId"] = new SelectList(_context.Productos, "ProductoId", "NombreProducto", productosTamanio.ProductoId);
+                    ViewData["TamanioId"] = new SelectList(_context.Tamanios, "TamanioId", "NombreTamanio", productosTamanio.TamanioId);
+                    return View(productosTamanio);
+                }
+
                 try
                 {
                     _context.Update(productosTamanio);
@@ -157,13 +184,23 @@ namespace PryCafeteria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var productosTamanio = await _context.ProductosTamanios.FindAsync(id);
-            if (productosTamanio != null)
+            var productoTamanio = await _context.ProductosTamanios
+                .Include(pt => pt.DetallePedidos)
+                .FirstOrDefaultAsync(pt => pt.ProductoTamanioId == id);
+
+            if (productoTamanio == null)
+                return NotFound();
+
+            // HU08 - E6: bloquear si tiene ventas
+            if (productoTamanio.DetallePedidos.Any())
             {
-                _context.ProductosTamanios.Remove(productosTamanio);
+                TempData["Error"] = "No se puede eliminar: este tamaño tiene ventas registradas. Considera marcarlo como Sin stock.";
+                return RedirectToAction(nameof(Index));
             }
 
+            _context.ProductosTamanios.Remove(productoTamanio);
             await _context.SaveChangesAsync();
+            TempData["Exito"] = "Tamaño eliminado correctamente";
             return RedirectToAction(nameof(Index));
         }
 

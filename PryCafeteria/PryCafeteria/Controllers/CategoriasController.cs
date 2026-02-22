@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using PryCafeteria.Models;
 
 namespace PryCafeteria.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class CategoriasController : Controller
     {
         private readonly BdcafeteriaContext _context;
@@ -21,7 +23,7 @@ namespace PryCafeteria.Controllers
         // GET: Categorias
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Categorias.ToListAsync());
+            return View(await _context.Categorias.Include(c => c.Productos).ToListAsync());
         }
 
         // GET: Categorias/Details/5
@@ -57,6 +59,15 @@ namespace PryCafeteria.Controllers
         {
             if (ModelState.IsValid)
             {
+                // HU05 - E2: validar nombre duplicado
+                var existe = await _context.Categorias.AnyAsync(c =>
+                    c.NombreCategoria.ToLower() == categoria.NombreCategoria.ToLower());
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreCategoria", "Esta categoría ya existe");
+                    return View(categoria);
+                }
+
                 _context.Add(categoria);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -94,6 +105,16 @@ namespace PryCafeteria.Controllers
 
             if (ModelState.IsValid)
             {
+                // HU05 - E2: validar nombre duplicado excluyendo la actual
+                var existe = await _context.Categorias.AnyAsync(c =>
+                    c.NombreCategoria.ToLower() == categoria.NombreCategoria.ToLower() &&
+                    c.CategoriaId != categoria.CategoriaId);
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreCategoria", "Esta categoría ya existe");
+                    return View(categoria);
+                }
+
                 try
                 {
                     _context.Update(categoria);
@@ -138,13 +159,23 @@ namespace PryCafeteria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var categoria = await _context.Categorias.FindAsync(id);
-            if (categoria != null)
+            var categoria = await _context.Categorias
+                .Include(c => c.Productos)
+                .FirstOrDefaultAsync(c => c.CategoriaId == id);
+
+            if (categoria == null)
+                return NotFound();
+
+            // HU05 - E5: bloquear si tiene productos
+            if (categoria.Productos.Any())
             {
-                _context.Categorias.Remove(categoria);
+                TempData["Error"] = $"No se puede eliminar: tiene {categoria.Productos.Count} producto(s) asociado(s)";
+                return RedirectToAction(nameof(Index));
             }
 
+            _context.Categorias.Remove(categoria);
             await _context.SaveChangesAsync();
+            TempData["Exito"] = "Categoría eliminada correctamente";
             return RedirectToAction(nameof(Index));
         }
 

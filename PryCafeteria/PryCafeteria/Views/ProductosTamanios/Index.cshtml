@@ -6,51 +6,67 @@
 
 <h1 class="text-cafe mt-4 mb-4">Gestión de Tamaños de productos</h1>
 
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle"></i> @TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-circle"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
 <p class="mb-3">
-    <a asp-action="Create" class="btn btn-cafe">
-        Nuevo Tamaño de producto
-    </a>
+    <a asp-action="Create" class="btn btn-cafe">Nuevo Tamaño de producto</a>
 </p>
 
 <table class="table table-hover align-middle border shadow-sm bg-white">
     <thead class="table-dark">
         <tr class="text-center">
-            <th class="py-3">
-                @Html.DisplayNameFor(model => model.Producto)
-            </th>
-            <th class="py-3">
-                @Html.DisplayNameFor(model => model.Tamanio)
-            </th>
-            <th class="py-3">
-                @Html.DisplayNameFor(model => model.Precio)
-            </th>
-            <th class="py-3">
-                @Html.DisplayNameFor(model => model.Stock)
-            </th>
+            <th class="py-3">Producto</th>
+            <th class="py-3">Tamaño</th>
+            <th class="py-3">Precio</th>
+            <th class="py-3">Stock</th>
+            <th class="py-3">Estado</th>
             <th class="py-3">Acciones</th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr class="text-center">
-            <td class="fw-bold">
-                    @Html.DisplayFor(modelItem => item.Producto.NombreProducto)
-            </td>
-            <td class="fw-bold">
-                    @Html.DisplayFor(modelItem => item.Tamanio.NombreTamanio)
-            </td>
-            <td class="fw-bold">
-                @Html.DisplayFor(modelItem => item.Precio)
-            </td>
-            <td class="fw-bold">
-                @Html.DisplayFor(modelItem => item.Stock)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ProductoTamanioId" class="btn btn-sm btn-beige text-white me-1">Actualizar</a> |
-                <a asp-action="Details" asp-route-id="@item.ProductoTamanioId" class="btn btn-sm btn-cafe text-white me-1">Detalles</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProductoTamanioId" class="btn btn-sm btn-danger">Eliminar</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr class="text-center">
+                <td class="fw-bold">@item.Producto.NombreProducto</td>
+                <td>@item.Tamanio.NombreTamanio</td>
+                <td>S/. @item.Precio.ToString("0.00")</td>
+                <td>@item.Stock</td>
+                <td>
+                    @if (item.Stock == 0)
+                    {
+                        <span class="badge bg-danger">Agotado</span>
+                    }
+                    else if (item.Stock <= 5)
+                    {
+                        <span class="badge bg-warning text-dark">⚠ Bajo stock</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">En stock</span>
+                    }
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ProductoTamanioId"
+                       class="btn btn-sm btn-beige text-white me-1">Actualizar</a> |
+                    <a asp-action="Details" asp-route-id="@item.ProductoTamanioId"
+                       class="btn btn-sm btn-cafe text-white me-1">Detalles</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ProductoTamanioId"
+                       class="btn btn-sm btn-danger">Eliminar</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

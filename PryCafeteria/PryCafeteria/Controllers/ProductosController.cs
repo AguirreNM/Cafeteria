@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using PryCafeteria.Models;
 
 namespace PryCafeteria.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class ProductosController : Controller
     {
         private readonly BdcafeteriaContext _context;
@@ -62,6 +64,16 @@ namespace PryCafeteria.Controllers
 
             if (ModelState.IsValid)
             {
+                // HU04 - E8: validar nombre duplicado
+                var existe = await _context.Productos.AnyAsync(p =>
+                    p.NombreProducto.ToLower() == producto.NombreProducto.ToLower());
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreProducto", "Ya existe un producto con este nombre");
+                    ViewData["CategoriaId"] = new SelectList(_context.Categorias, "CategoriaId", "NombreCategoria", producto.CategoriaId);
+                    return View(producto);
+                }
+
                 _context.Add(producto);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -103,6 +115,17 @@ namespace PryCafeteria.Controllers
 
             if (ModelState.IsValid)
             {
+                // HU04 - E8: validar nombre duplicado excluyendo el actual
+                var existe = await _context.Productos.AnyAsync(p =>
+                    p.NombreProducto.ToLower() == producto.NombreProducto.ToLower() &&
+                    p.ProductoId != producto.ProductoId);
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreProducto", "Ya existe un producto con este nombre");
+                    ViewData["CategoriaId"] = new SelectList(_context.Categorias, "CategoriaId", "NombreCategoria", producto.CategoriaId);
+                    return View(producto);
+                }
+
                 try
                 {
                     _context.Update(producto);
@@ -149,13 +172,27 @@ namespace PryCafeteria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var producto = await _context.Productos.FindAsync(id);
-            if (producto != null)
+            var producto = await _context.Productos
+                .Include(p => p.ProductosTamanios)
+                    .ThenInclude(pt => pt.DetallePedidos)
+                .FirstOrDefaultAsync(p => p.ProductoId == id);
+
+            if (producto == null)
+                return NotFound();
+
+            // HU04 - E6: bloquear si tiene ventas registradas
+            var tieneVentas = producto.ProductosTamanios
+                .Any(pt => pt.DetallePedidos.Any());
+
+            if (tieneVentas)
             {
-                _context.Productos.Remove(producto);
+                TempData["Error"] = "No se puede eliminar: el producto tiene ventas registradas. Considera marcarlo como No disponible.";
+                return RedirectToAction(nameof(Index));
             }
 
+            _context.Productos.Remove(producto);
             await _context.SaveChangesAsync();
+            TempData["Exito"] = "Producto eliminado correctamente";
             return RedirectToAction(nameof(Index));
         }
 

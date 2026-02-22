@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using PryCafeteria.Models;
 
 namespace PryCafeteria.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class TamaniosController : Controller
     {
         private readonly BdcafeteriaContext _context;
@@ -57,8 +59,17 @@ namespace PryCafeteria.Controllers
         {
             if (ModelState.IsValid)
             {
+                var existe = await _context.Tamanios.AnyAsync(t =>
+                    t.NombreTamanio.ToLower() == tamanio.NombreTamanio.ToLower());
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreTamanio", "Ya existe un tamaño con este nombre");
+                    return View(tamanio);
+                }
+
                 _context.Add(tamanio);
                 await _context.SaveChangesAsync();
+                TempData["Exito"] = "Tamaño creado correctamente";
                 return RedirectToAction(nameof(Index));
             }
             return View(tamanio);
@@ -94,10 +105,20 @@ namespace PryCafeteria.Controllers
 
             if (ModelState.IsValid)
             {
+                var existe = await _context.Tamanios.AnyAsync(t =>
+                    t.NombreTamanio.ToLower() == tamanio.NombreTamanio.ToLower() &&
+                    t.TamanioId != tamanio.TamanioId);
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreTamanio", "Ya existe un tamaño con este nombre");
+                    return View(tamanio);
+                }
+
                 try
                 {
                     _context.Update(tamanio);
                     await _context.SaveChangesAsync();
+                    TempData["Exito"] = "Tamaño actualizado correctamente";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -138,13 +159,22 @@ namespace PryCafeteria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var tamanio = await _context.Tamanios.FindAsync(id);
-            if (tamanio != null)
+            var tamanio = await _context.Tamanios
+                .Include(t => t.ProductosTamanios)
+                .FirstOrDefaultAsync(t => t.TamanioId == id);
+
+            if (tamanio == null)
+                return NotFound();
+
+            if (tamanio.ProductosTamanios.Any())
             {
-                _context.Tamanios.Remove(tamanio);
+                TempData["Error"] = $"No se puede eliminar: el tamaño tiene {tamanio.ProductosTamanios.Count} producto(s) asociado(s)";
+                return RedirectToAction(nameof(Index));
             }
 
+            _context.Tamanios.Remove(tamanio);
             await _context.SaveChangesAsync();
+            TempData["Exito"] = "Tamaño eliminado correctamente";
             return RedirectToAction(nameof(Index));
         }
 

@@ -1,47 +1,58 @@
-﻿@model PryCafeteria.Models.Usuario
+﻿@model PryCafeteria.Models.ViewModels.UsuarioViewModel
 
 @{
-    ViewData["Title"] = "Creacion de Usuario";
+    ViewData["Title"] = "Nuevo Administrador";
 }
 
 <div class="row justify-content-center mt-4">
     <div class="col-md-6">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-cafe text-white p-3">
-                <h4 class="mb-1">Nuevo Usuario</h4>
+                <h4 class="mb-1">Nuevo Administrador</h4>
             </div>
             <div class="card-body p-4">
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
                     <div class="mb-3">
-                        <label asp-for="Nombre" class="form-label fw-bold text-cafe">Nombre Completo</label>
-                        <input asp-for="Nombre" class="form-control form-control-cafe" placeholder="Ingrese el nombre de usuario" />
+                        <label asp-for="Nombre" class="form-label fw-bold text-cafe"></label>
+                        <input asp-for="Nombre" class="form-control" placeholder="Ej: Juan" />
                         <span asp-validation-for="Nombre" class="text-danger small"></span>
                     </div>
+
                     <div class="mb-3">
-                        <label asp-for="Email" class="form-label fw-bold text-cafe">Correo Electrónico</label>
-                        <input asp-for="Email" class="form-control form-control-cafe" placeholder="ejemplo@correo.com"/>
+                        <label asp-for="Apellido" class="form-label fw-bold text-cafe"></label>
+                        <input asp-for="Apellido" class="form-control" placeholder="Ej: Pérez" />
+                        <span asp-validation-for="Apellido" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-bold text-cafe"></label>
+                        <input asp-for="Email" class="form-control" placeholder="correo@ejemplo.com" />
                         <span asp-validation-for="Email" class="text-danger small"></span>
                     </div>
+
                     <div class="mb-3">
-                        <label asp-for="Contrasena" class="form-label fw-bold text-cafe">Contraseña</label>
-                        <input asp-for="Contrasena" type="password" class="form-control form-control-cafe" placeholder="Ingrese una contraseña" />
-                        <span asp-validation-for="Contrasena" class="text-danger small"></span>
+                        <label asp-for="Password" class="form-label fw-bold text-cafe"></label>
+                        <input asp-for="Password" type="password" class="form-control" placeholder="Mínimo 6 caracteres" />
+                        <span asp-validation-for="Password" class="text-danger small"></span>
                     </div>
+
                     <div class="mb-4">
-                        <label asp-for="RolId" class="form-label fw-bold text-cafe">Rol</label>
-                        <select asp-for="RolId" class ="form-select form-control-cafe" asp-items="ViewBag.RolId">
+                        <label asp-for="Rol" class="form-label fw-bold text-cafe"></label>
+                        <select asp-for="Rol" class="form-select">
                             <option value="">-- Seleccione un rol --</option>
+                            @foreach (var rol in ViewBag.Roles as List<string> ?? new List<string>())
+                            {
+                                <option value="@rol">@rol</option>
+                            }
                         </select>
-                        <span asp-validation-for="RolId" class="text-danger small"></span>
+                        <span asp-validation-for="Rol" class="text-danger small"></span>
                     </div>
+
                     <div class="d-grid gap-2">
-                        <button type="submit" class="btn btn-cafe py-2">
-                            Guardar Usuario
-                        </button>
-                        <a asp-action="Index" class="btn btn-outline-secondary">
-                            Cancelar
-                        </a>
+                        <button type="submit" class="btn btn-cafe py-2 fw-bold">Guardar Usuario</button>
+                        <a asp-action="Index" class="btn btn-outline-secondary py-2">Cancelar</a>
                     </div>
                 </form>
             </div>
@@ -49,22 +60,8 @@
     </div>
 </div>
 
-<style>
-    .form-control-cafe:focus,
-    .form-select:focus {
-        border-color: #00704A;
-        box-shadow: 0 0 0 0.2rem rgba(0, 112, 74, 0.15);
-    }
-
-    .card-header {
-        border-bottom: 3px solid #D4AF77;
-    }
-
-    .form-label {
-        margin-bottom: 0.5rem;
-    }
-</style>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

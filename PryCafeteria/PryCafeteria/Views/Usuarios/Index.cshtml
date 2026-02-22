@@ -1,57 +1,98 @@
-﻿@model IEnumerable<PryCafeteria.Models.Usuario>
+﻿@model IEnumerable<PryCafeteria.Models.ViewModels.UsuarioViewModel>
 
 @{
-    ViewData["Title"] = "Usuarios";
+    ViewData["Title"] = "Gestión de Usuarios";
 }
 
 <h1 class="text-cafe mt-4 mb-4">Gestión de Usuarios</h1>
 
-<p class="mb-3">
-    <a asp-action="Create" class="btn btn-cafe">
-        Nuevo Usuario
-    </a>
-</p>
+@if (TempData["Exito"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show">
+        <i class="bi bi-check-circle"></i> @TempData["Exito"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show">
+        <i class="bi bi-exclamation-circle"></i> @TempData["Error"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+<!-- Tabs: Admins / Clientes -->
+<ul class="nav nav-tabs mb-3">
+    <li class="nav-item">
+        <a class="nav-link @(ViewBag.Tab == "clientes" ? "" : "active")"
+           asp-action="Index" asp-route-tab="admins">Administradores</a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link @(ViewBag.Tab == "clientes" ? "active" : "")"
+           asp-action="Index" asp-route-tab="clientes">Clientes</a>
+    </li>
+</ul>
+
+<!-- Buscador -->
+<form method="get" class="d-flex mb-3 gap-2">
+    <input type="hidden" name="tab" value="@ViewBag.Tab" />
+    <input type="text" name="buscar" value="@ViewBag.Buscar"
+           class="form-control" placeholder="Buscar por nombre o email..." style="max-width:350px" />
+    <button type="submit" class="btn btn-cafe">Buscar</button>
+    @if (!string.IsNullOrEmpty(ViewBag.Buscar as string))
+    {
+        <a asp-action="Index" asp-route-tab="@ViewBag.Tab" class="btn btn-outline-secondary">Limpiar</a>
+    }
+</form>
+
+@if (ViewBag.Tab != "clientes")
+{
+    <p>
+        <a asp-action="Create" class="btn btn-cafe">+ Nuevo Administrador</a>
+    </p>
+}
 
 <table class="table table-hover align-middle border shadow-sm bg-white">
     <thead class="table-dark">
         <tr class="text-center">
-            <th class="py-3">
-                @Html.DisplayNameFor(model => model.Nombre)
-            </th>
-            <th class="py-3">
-                @Html.DisplayNameFor(model => model.Email)
-            </th>
-            <th class="py-3">
-                @Html.DisplayNameFor(model => model.Contrasena)
-            </th>
-            <th class="py-3">
-                @Html.DisplayNameFor(model => model.Rol)
-            </th>
-            <th class="py-3">Acciones</th>
+            <th class="py-3">Nombre</th>
+            <th class="py-3">Email</th>
+            <th class="py-3">Rol</th>
+            <th class="py-3">Fecha Registro</th>
+            <th class="py-3">Pedidos</th>
+            @if (ViewBag.Tab != "clientes")
+            {
+                <th class="py-3">Acciones</th>
+            }
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr class="text-center">
-            <td class="fw-bold">
-                @Html.DisplayFor(modelItem => item.Nombre)
-            </td>
-            <td class="text-muted">
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td class="text-muted">
-                <span class="badge bg-cafe-light text-cafe">••••••••</span>
-            </td>
-            <td>
-                <span class="badge bg-info text-white">@Html.DisplayFor(modelItem => item.Rol.RolNombre)</span>
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.UsuarioId" class="btn btn-sm btn-beige text-white me-1">Actualizar</a> |
-                <a asp-action="Details" asp-route-id="@item.UsuarioId" class="btn btn-sm btn-cafe text-white me-1">Detalles</a> |
-                <a asp-action="Delete" asp-route-id="@item.UsuarioId" class="btn btn-sm btn-danger">Eliminar</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr class="text-center">
+                <td class="fw-bold">@item.Nombre @item.Apellido</td>
+                <td class="text-muted small">@item.Email</td>
+                <td>
+                    <span class="badge @(item.Rol == "Admin" ? "bg-danger" : "bg-success")">
+                        @item.Rol
+                    </span>
+                </td>
+                <td class="text-muted small">@(item.FechaRegistro.HasValue ? item.FechaRegistro.Value.ToString("dd/MM/yyyy") : "-")</td>
+                <td>@item.TotalPedidos</td>
+                @if (ViewBag.Tab != "clientes")
+                {
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id"
+                           class="btn btn-sm btn-beige text-white me-1">Editar</a>
+                        <form asp-action="Delete" method="post" class="d-inline"
+                              onsubmit="return confirm('¿Eliminar este usuario?')">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                }
+            </tr>
+        }
     </tbody>
 </table>
-

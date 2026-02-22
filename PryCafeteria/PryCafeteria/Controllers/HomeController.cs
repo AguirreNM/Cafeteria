@@ -15,6 +15,9 @@ namespace PryCafeteria.Controllers
 
         public IActionResult Index()
         {
+            if (User.IsInRole("Admin"))
+                return RedirectToAction("Index", "Dashboard");
+
             return View();
         }
     }
