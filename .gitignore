@@ -223,5 +223,11 @@ $RECYCLE.BIN/
 __pycache__/
 *.pyc
 
-# User-specific files
+# Configuración local (contiene datos sensibles de la PC del desarrollador)
+# Copiar appsettings.Development.json.example como appsettings.Development.json y configurar
 appsettings.Development.json
+# El archivo .example SÍ se sube a GitHub como guía
+!appsettings.Development.json.example
+
+# Archivo de scaffold con cadena de conexión local - no subir
+Scaffold.txt

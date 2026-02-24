@@ -1,0 +1,12 @@
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+
+  "ConnectionStrings": {
+    "BDCAFETERIAConn": "Persist Security Info=False;Integrated Security=True;Initial Catalog=BDCAFETERIA;Server=TU_SERVIDOR;Encrypt=True;TrustServerCertificate=True;"
+  }
+}

@@ -50,6 +50,10 @@ var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
+    // Aplicar migraciones pendientes automáticamente al iniciar
+    var db = scope.ServiceProvider.GetRequiredService<BdcafeteriaContext>();
+    db.Database.Migrate();
+
     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
 

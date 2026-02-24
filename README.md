@@ -2,6 +2,8 @@
 
 Sistema de gestión para cafetería desarrollado con **ASP.NET Core 8.0 MVC**, **Entity Framework Core** y **ASP.NET Identity**.
 
+---
+
 ## 🚀 Funcionalidades Implementadas (MVP)
 
 ### HU01 — Registro de clientes
@@ -40,6 +42,7 @@ Sistema de gestión para cafetería desarrollado con **ASP.NET Core 8.0 MVC**, *
 ### HU08 — Tamaños y precios por producto
 - CRUD de tamaños y combinaciones producto-tamaño
 - Validación de precio mayor a 0
+- Validación de stock no negativo
 - Validación de combinación única producto+tamaño
 - Bloqueo de eliminación si tiene ventas registradas
 
@@ -59,61 +62,85 @@ Sistema de gestión para cafetería desarrollado con **ASP.NET Core 8.0 MVC**, *
 
 ## 🛠️ Tecnologías Utilizadas
 
-- **Framework:** ASP.NET Core 8.0 MVC
-- **ORM:** Entity Framework Core 8
-- **Autenticación:** ASP.NET Core Identity
-- **Base de Datos:** SQL Server / SQL Server Express
-- **Frontend:** Razor Views, Bootstrap 5, jQuery, Font Awesome
-- **Patrón:** MVC (Model-View-Controller)
+| Tecnología | Versión | Uso |
+|---|---|---|
+| ASP.NET Core MVC | 8.0 | Framework principal |
+| Entity Framework Core | 8.0 | ORM y migraciones |
+| ASP.NET Core Identity | 8.0 | Autenticación y roles |
+| SQL Server / SQL Server Express | 2019+ | Base de datos |
+| Bootstrap | 5 | Estilos y componentes UI |
+| jQuery | 3.x | Validaciones cliente |
 
 ---
 
 ## 📋 Requisitos Previos
 
-- .NET 8.0 SDK
-- SQL Server 2019+ o SQL Server Express
-- Visual Studio 2022 (recomendado)
+- [.NET 8.0 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
+- SQL Server 2019+ **o** SQL Server Express (instalación gratuita)
+- Visual Studio 2022 (recomendado) **o** VS Code con extensión C#
 
 ---
 
-## 🔧 Instalación
+## 🔧 Instalación paso a paso
 
 ### 1. Clonar el repositorio
+
 ```bash
 git clone https://github.com/AguirreNM/Cafeter-a.git
 cd Cafeter-a
 ```
 
-### 2. Crear la base de datos
-Ejecuta el script SQL ubicado en la raíz del proyecto:
+### 2. Identificar el nombre de tu servidor SQL
+
+Este es el paso más importante al instalar en una PC nueva. Abre **SQL Server Management Studio (SSMS)** — el nombre que aparece en el campo "Server name" al conectarte es el que necesitas.
+
+Los nombres más comunes son:
+
+| Caso | Server name a usar |
+|---|---|
+| SQL Server Express (instalación estándar) | `localhost\SQLEXPRESS` |
+| SQL Server Express con nombre de PC | `NOMBRE-PC\SQLEXPRESS` |
+| SQL Server Developer/Standard | `localhost` |
+| SQL LocalDB (Visual Studio) | `(localdb)\MSSQLLocalDB` |
+
+Si no sabes cuál es, ejecútalo en SSMS:
 ```sql
-BDCAFETERIA.sql
+SELECT @@SERVERNAME
 ```
 
 ### 3. Configurar la cadena de conexión
-Edita `PryCafeteria/PryCafeteria/appsettings.json`:
+
+Edita el archivo `PryCafeteria/PryCafeteria/appsettings.json` y reemplaza el valor de `Server` con el nombre de tu servidor:
+
 ```json
 {
   "ConnectionStrings": {
-    "BDCAFETERIAConn": "Server=TU_SERVIDOR;Database=BDCAFETERIA;Integrated Security=True;TrustServerCertificate=True;"
+    "BDCAFETERIAConn": "Persist Security Info=False;Integrated Security=True;Initial Catalog=BDCAFETERIA;Server=localhost\\SQLEXPRESS;Encrypt=True;TrustServerCertificate=True;"
   }
 }
 ```
 
-### 4. Aplicar migraciones
+> **Nota:** El archivo `appsettings.Development.json.example` en el proyecto sirve como plantilla. Puedes copiarlo como `appsettings.Development.json` y poner ahí tu configuración local (este archivo está en .gitignore y no se sube a GitHub).
+
+### 4. Ejecutar el proyecto
+
+**Opción A — Visual Studio 2022:**
+- Abre `PryCafeteria.sln`
+- Presiona `F5` o el botón ▶ Run
+
+**Opción B — Terminal:**
 ```bash
 cd PryCafeteria/PryCafeteria
-dotnet ef database update
-```
-
-### 5. Ejecutar el proyecto
-```bash
 dotnet run
 ```
 
----
+La app estará disponible en `https://localhost:7238` (el puerto puede variar, revisa la consola).
 
-## 👤 Usuario Administrador por Defecto
+> **La base de datos se crea automáticamente al ejecutar la app por primera vez.** No necesitas correr ningún script SQL ni `dotnet ef database update` — el sistema aplica las migraciones solo.
+
+### 6. Primer acceso
+
+Al ejecutar por primera vez, el sistema crea automáticamente el usuario admin:
 
 ```
 Email:      admin@gmail.com
@@ -123,40 +150,72 @@ Rol:        Admin
 
 ---
 
+## ❗ Solución de problemas comunes
+
+### Error: "A network-related error occurred"
+El servidor SQL no se encontró. Verifica que:
+- SQL Server esté corriendo (busca "SQL Server" en los Servicios de Windows)
+- El nombre del servidor en `appsettings.json` sea correcto
+
+### Error: "Cannot open database BDCAFETERIA"
+La base de datos no existe. Ejecuta `dotnet ef database update`
+
+### Error: "Login failed for user"
+Estás usando autenticación de usuario y contraseña en vez de Windows Authentication. La cadena de conexión incluida usa `Integrated Security=True` que usa tu usuario de Windows — no necesitas usuario/contraseña de SQL Server.
+
+### Error al ejecutar `dotnet ef`
+Instala las herramientas de EF:
+```bash
+dotnet tool install --global dotnet-ef --version 8.*
+```
+
+---
+
 ## 📊 Estructura del Proyecto
 
 ```
 PryCafeteria/
 ├── Controllers/
-│   ├── CuentasController.cs       # Login, registro, logout
-│   ├── DashboardController.cs     # Panel administrativo
-│   ├── UsuariosController.cs      # Gestión de usuarios
-│   ├── ProductosController.cs     # CRUD productos
-│   ├── CategoriasController.cs    # CRUD categorías
-│   ├── TamaniosController.cs      # CRUD tamaños
-│   ├── ProductosTamaniosController.cs  # Stock y precios
-│   ├── CuponesController.cs       # CRUD cupones
-│   └── MetodosPagosController.cs  # Métodos de pago
+│   ├── CuentasController.cs           # Login, registro, logout
+│   ├── DashboardController.cs         # Panel administrativo
+│   ├── UsuariosController.cs          # Gestión de usuarios (CRUD)
+│   ├── ProductosController.cs         # CRUD productos
+│   ├── CategoriasController.cs        # CRUD categorías
+│   ├── TamaniosController.cs          # CRUD tamaños
+│   ├── ProductosTamaniosController.cs # Precios y stock
+│   ├── CuponesController.cs           # CRUD cupones
+│   └── MetodosPagosController.cs      # Métodos de pago
 ├── Models/
-│   ├── ApplicationUser.cs         # Usuario extendido con Identity
-│   ├── CustomClaimsPrincipalFactory.cs  # Claims personalizados
-│   ├── ViewModels/                # LoginViewModel, RegistroViewModel, UsuarioViewModel
-│   └── ...                        # Modelos de BD (EF)
+│   ├── ApplicationUser.cs             # Usuario extendido con Identity
+│   ├── BdcafeteriaContext.cs          # DbContext de EF Core
+│   ├── CustomClaimsPrincipalFactory.cs # Claims con nombre del usuario
+│   ├── ViewModels/
+│   │   ├── LoginViewModel.cs
+│   │   ├── RegistroViewModel.cs
+│   │   └── UsuarioViewModel.cs
+│   └── (modelos de BD: Categoria, Producto, Tamanio, etc.)
+├── Migrations/
+│   ├── 20260210012412_InitialWithIdentity.cs  # Migración inicial
+│   └── 20260222013522_AgregarFechaRegistro.cs # Agrega FechaRegistro
 ├── Views/
-│   ├── Cuentas/                   # Login y registro
-│   ├── Dashboard/                 # Panel admin
-│   ├── Usuarios/
+│   ├── Cuentas/        # Login y registro
+│   ├── Dashboard/      # Panel admin
+│   ├── Usuarios/       # Gestión de usuarios
 │   ├── Productos/
 │   ├── Categorias/
 │   ├── Tamanios/
 │   ├── ProductosTamanios/
-│   └── Shared/_Layout.cshtml
-├── Migrations/                    # Migraciones EF
+│   ├── Cupones/
+│   ├── MetodosPagos/
+│   └── Shared/
+│       └── _Layout.cshtml  # Layout principal con navbar
 ├── wwwroot/
-│   ├── css/                       # site.css, dashboard.css, login-style.css
-│   ├── js/                        # login-script.js
-│   └── images/productos/          # Imágenes por categoría
-└── Program.cs                     # Configuración de la aplicación
+│   ├── css/            # site.css, dashboard.css, login-style.css
+│   ├── js/             # login-script.js
+│   └── images/productos/ # Imágenes por categoría
+├── appsettings.json                    # Configuración (editar Server aquí)
+├── appsettings.Development.json.example # Plantilla de configuración
+└── Program.cs                          # Configuración y seeding inicial
 ```
 
 ---
@@ -165,17 +224,25 @@ PryCafeteria/
 
 | Tabla | Descripción |
 |---|---|
-| AspNetUsers | Usuarios (Identity + Nombre, Apellido, FechaRegistro) |
-| AspNetRoles | Roles: Admin, Cliente |
-| Categorias | Categorías de productos |
-| Productos | Catálogo de productos |
-| Tamanios | Tamaños disponibles (Pequeño, Mediano, Grande) |
-| ProductosTamanios | Precios y stock por producto+tamaño |
-| Pedidos | Órdenes de compra |
-| DetallePedido | Items de cada pedido |
-| Cupones | Descuentos por porcentaje o monto fijo |
-| MetodosPago | Métodos de pago disponibles |
-| DireccionesEntrega | Direcciones de clientes |
+| **AspNetUsers** | Usuarios extendidos con Nombre, Apellido, FechaRegistro |
+| **AspNetRoles** | Roles del sistema: Admin, Cliente |
+| **AspNetUserRoles** | Relación usuario-rol (generada por Identity) |
+| **AspNetUserClaims** | Claims adicionales por usuario (generada por Identity) |
+| **AspNetUserLogins** | Logins externos OAuth (generada por Identity) |
+| **AspNetUserTokens** | Tokens de seguridad (generada por Identity) |
+| **AspNetRoleClaims** | Claims por rol (generada por Identity) |
+| **__EFMigrationsHistory** | Historial de migraciones aplicadas (generada por EF Core) |
+| **Categorias** | Categorías de productos |
+| **Productos** | Catálogo de productos con imagen y disponibilidad |
+| **Tamanios** | Tamaños disponibles (Pequeño, Mediano, Grande) |
+| **ProductosTamanios** | Precios y stock por combinación producto+tamaño |
+| **Pedidos** | Órdenes de compra con estado y total |
+| **DetallePedido** | Items individuales de cada pedido |
+| **Cupones** | Descuentos por porcentaje o monto fijo |
+| **MetodosPago** | Métodos de pago disponibles |
+| **DireccionesEntrega** | Direcciones registradas por los clientes |
+
+> La base de datos se crea completamente desde cero con `dotnet ef database update`. No se necesita ningún script SQL adicional.
 
 ---
 
@@ -185,7 +252,7 @@ PryCafeteria/
 |---|---|
 | Verde Starbucks | #00704A |
 | Verde Oscuro | #005238 |
-| Crema | #D4AF77 |
+| Crema / Beige | #D4AF77 |
 | Fondo claro | #F0EBE0 |
 
 ---

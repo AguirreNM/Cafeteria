@@ -59,8 +59,18 @@ namespace PryCafeteria.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Validar nombre duplicado
+                var existe = await _context.Cupones.AnyAsync(c =>
+                    c.NombreCupon.ToLower() == cupone.NombreCupon.ToLower());
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreCupon", "Ya existe un cupón con este nombre");
+                    return View(cupone);
+                }
+
                 _context.Add(cupone);
                 await _context.SaveChangesAsync();
+                TempData["Exito"] = "Cupón creado correctamente";
                 return RedirectToAction(nameof(Index));
             }
             return View(cupone);
@@ -96,10 +106,21 @@ namespace PryCafeteria.Controllers
 
             if (ModelState.IsValid)
             {
+                // Validar nombre duplicado excluyendo el actual
+                var existe = await _context.Cupones.AnyAsync(c =>
+                    c.NombreCupon.ToLower() == cupone.NombreCupon.ToLower() &&
+                    c.CuponId != cupone.CuponId);
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreCupon", "Ya existe un cupón con este nombre");
+                    return View(cupone);
+                }
+
                 try
                 {
                     _context.Update(cupone);
                     await _context.SaveChangesAsync();
+                    TempData["Exito"] = "Cupón actualizado correctamente";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -141,12 +162,12 @@ namespace PryCafeteria.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var cupone = await _context.Cupones.FindAsync(id);
-            if (cupone != null)
-            {
-                _context.Cupones.Remove(cupone);
-            }
+            if (cupone == null)
+                return NotFound();
 
+            _context.Cupones.Remove(cupone);
             await _context.SaveChangesAsync();
+            TempData["Exito"] = "Cupón eliminado correctamente";
             return RedirectToAction(nameof(Index));
         }
 

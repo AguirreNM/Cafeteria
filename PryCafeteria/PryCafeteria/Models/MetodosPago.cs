@@ -8,6 +8,8 @@ public partial class MetodosPago
 {
     public int MetodoPagoId { get; set; }
 
+    [Required(ErrorMessage = "El nombre del método de pago es obligatorio")]
+    [StringLength(50, MinimumLength = 3, ErrorMessage = "El nombre debe tener entre 3 y 50 caracteres")]
     [Display(Name = "Nombre")]
     public string NombreMetodoPago { get; set; } = null!;
 

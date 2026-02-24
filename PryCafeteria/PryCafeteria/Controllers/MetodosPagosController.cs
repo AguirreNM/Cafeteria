@@ -59,8 +59,18 @@ namespace PryCafeteria.Controllers
         {
             if (ModelState.IsValid)
             {
+                // Validar nombre duplicado
+                var existe = await _context.MetodosPagos.AnyAsync(m =>
+                    m.NombreMetodoPago.ToLower() == metodosPago.NombreMetodoPago.ToLower());
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreMetodoPago", "Ya existe un método de pago con este nombre");
+                    return View(metodosPago);
+                }
+
                 _context.Add(metodosPago);
                 await _context.SaveChangesAsync();
+                TempData["Exito"] = "Método de pago creado correctamente";
                 return RedirectToAction(nameof(Index));
             }
             return View(metodosPago);
@@ -96,10 +106,21 @@ namespace PryCafeteria.Controllers
 
             if (ModelState.IsValid)
             {
+                // Validar nombre duplicado excluyendo el actual
+                var existe = await _context.MetodosPagos.AnyAsync(m =>
+                    m.NombreMetodoPago.ToLower() == metodosPago.NombreMetodoPago.ToLower() &&
+                    m.MetodoPagoId != metodosPago.MetodoPagoId);
+                if (existe)
+                {
+                    ModelState.AddModelError("NombreMetodoPago", "Ya existe un método de pago con este nombre");
+                    return View(metodosPago);
+                }
+
                 try
                 {
                     _context.Update(metodosPago);
                     await _context.SaveChangesAsync();
+                    TempData["Exito"] = "Método de pago actualizado correctamente";
                 }
                 catch (DbUpdateConcurrencyException)
                 {
@@ -140,13 +161,23 @@ namespace PryCafeteria.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var metodosPago = await _context.MetodosPagos.FindAsync(id);
-            if (metodosPago != null)
+            var metodosPago = await _context.MetodosPagos
+                .Include(m => m.Pedidos)
+                .FirstOrDefaultAsync(m => m.MetodoPagoId == id);
+
+            if (metodosPago == null)
+                return NotFound();
+
+            // Bloquear si tiene pedidos asociados
+            if (metodosPago.Pedidos.Any())
             {
-                _context.MetodosPagos.Remove(metodosPago);
+                TempData["Error"] = $"No se puede eliminar: tiene {metodosPago.Pedidos.Count} pedido(s) asociado(s)";
+                return RedirectToAction(nameof(Index));
             }
 
+            _context.MetodosPagos.Remove(metodosPago);
             await _context.SaveChangesAsync();
+            TempData["Exito"] = "Método de pago eliminado correctamente";
             return RedirectToAction(nameof(Index));
         }
 
