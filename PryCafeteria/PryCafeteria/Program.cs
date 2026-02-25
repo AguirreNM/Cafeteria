@@ -9,7 +9,8 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddDbContext<BdcafeteriaContext>(options =>
     options.UseSqlServer(
-        builder.Configuration.GetConnectionString("BDCAFETERIAConn")
+        builder.Configuration.GetConnectionString("BDCAFETERIAConn"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure()
     )
 );
 
